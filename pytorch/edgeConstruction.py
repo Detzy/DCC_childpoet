@@ -18,6 +18,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.metrics.pairwise import distance_metrics
 import matplotlib.pyplot as plt
 
+
 def load_data(filename, n_samples):
     import pickle
     fo = open(filename, 'rb')

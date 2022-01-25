@@ -32,6 +32,8 @@ class DCCLoss(nn.Module):
         self.U.data = torch.from_numpy(initU)
 
     def forward(self, enc_out, sampweights, pairweights, pairs, index, _sigma1, _sigma2, _lambda):
+        index = index.long()
+        pairs = pairs.long()
         centroids = self.U[index]
 
         # note that sigmas here are labelled mu in the paper
