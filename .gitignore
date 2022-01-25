@@ -5,3 +5,6 @@ __pychache__
 data
 venv
 .idea
+/.idea/
+/shelf/
+/workspace.xml
