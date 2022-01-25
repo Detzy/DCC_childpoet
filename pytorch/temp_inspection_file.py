@@ -44,7 +44,6 @@ def main(arg):
     threshold = 100
     # outputdir = get_output_dir(arg.db)
     datadir = get_data_dir(arg.db)
-
     data1 = sio.loadmat(os.path.join(datadir, 'pretrained.mat'))
 
     fo = open(os.path.join(datadir, 'pretrained.pkl'), 'rb')

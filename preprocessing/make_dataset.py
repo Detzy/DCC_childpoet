@@ -14,7 +14,7 @@ File responsible for preprocessing image files to csv files: testdata.csv and tr
 def iterate_image_files(folder_path):
     """
     Iterates through a folder, listing any image file and produces an 'X' array with images unpacked to a 1D vector,
-    and a 'Y' array with the names of t
+    and a 'file_names' array with the names of t. The 'Y' array is full of random numbers.
 
     :param folder_path: Complete system path of folder containing the images
     :return: np.array of shape (n, 4) where n is the number of images with the given label
@@ -38,10 +38,11 @@ def iterate_image_files(folder_path):
 
         file_names.append(os.path.basename(full_filepath))
 
+    file_names = np.array(file_names)
     x = np.array(image_vector)
-    y = np.array(file_names)
+    y = np.random.randint(0, 3, file_names.size)
 
-    return x, y
+    return x, y, file_names
 
 
 def shuffle_vectors(vec2d, vec1d):
@@ -53,22 +54,28 @@ def shuffle_vectors(vec2d, vec1d):
 def main(image_path, data_name, tt_split_ratio=0.8):
     datadir = get_data_dir(data_name)
 
-    x, y = iterate_image_files(folder_path=image_path)
-    x_shuffled, y_shuffled = shuffle_vectors(x, y)
+    x, y, filenames = iterate_image_files(folder_path=image_path)
+    x_shuffled, filenames_shuffled = shuffle_vectors(x, filenames)
     assert x_shuffled.shape == x.shape
-    assert y_shuffled.shape == y.shape
+    assert filenames_shuffled.shape == filenames.shape
     tt_split = int(tt_split_ratio*x_shuffled.shape[0])
 
     sio.savemat(
         file_name=osp.join(datadir, 'traindata.mat'),
-        mdict={'X': x_shuffled[:tt_split, :],
-               'Y': y_shuffled[:tt_split]},
+        mdict={
+            'X': x_shuffled[:tt_split, :],
+            'Y': y[:tt_split],
+            'filenames': filenames_shuffled[:tt_split]
+        },
     )
 
     sio.savemat(
         file_name=osp.join(datadir, 'testdata.mat'),
-        mdict={'X': x_shuffled[tt_split:, :],
-               'Y': y_shuffled[tt_split:]},
+        mdict={
+            'X': x_shuffled[tt_split:, :],
+            'Y': y[tt_split:],
+            'filenames': filenames_shuffled[tt_split:]
+        },
     )
 
 

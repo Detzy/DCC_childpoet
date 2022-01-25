@@ -50,12 +50,7 @@ def main(args):
         x1 = data1['X'][:].astype(np.float32).reshape((len(data1['gtlabels'].T), -1))
 
         a, b = np.where(x0 - x1)
-        # print(x0[a, b], x1[a, b])
-        # c = (x0-x1).reshape(51212288)
-        # print(a.size, b.size, (x0-x1).shape, sum(c))
-        # print(x0-x1)
-        # print(a[:5], b[:5])
-        # print(c)
+
         assert not a.size
 
         joined_data = {'gtlabels': data0['labels'][:], 'X': data0['data'][:].astype(np.float32),

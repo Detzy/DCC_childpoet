@@ -208,7 +208,7 @@ def main(args, net=None):
                          'delta2': _delta2,
                          }, index, filename=outputdir)
 
-    output = {'Z': Z, 'U': U, 'gtlabels': labels, 'w': pairs, 'cluster':assignment}
+    output = {'Z': Z, 'U': U, 'gtlabels': labels, 'w': pairs, 'cluster': assignment}
     sio.savemat(os.path.join(outputdir, 'features'), output)
 
 def load_weights(args, outputdir, net):
@@ -299,9 +299,11 @@ def test(testloader, net, criterion, epoch, use_cuda, _delta, pairs, numeval, fl
 
     # logs clustering measures only if sigma2 has reached the minimum (delta2)
     if flag:
+        print("Before computing obj")
         index, ari, ami, nmi, acc, n_components, assignment = computeObj(U, pairs, _delta, labels, numeval)
 
         # log to TensorBoard
+        print("Before second logging")
         change_in_assign = np.abs(oldassignment - index).sum()
         if logger:
             logger.add_scalar('ARI', ari, epoch)
