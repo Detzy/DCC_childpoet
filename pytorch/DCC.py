@@ -299,11 +299,9 @@ def test(testloader, net, criterion, epoch, use_cuda, _delta, pairs, numeval, fl
 
     # logs clustering measures only if sigma2 has reached the minimum (delta2)
     if flag:
-        print("Before computing obj")
         index, ari, ami, nmi, acc, n_components, assignment = computeObj(U, pairs, _delta, labels, numeval)
 
         # log to TensorBoard
-        print("Before second logging")
         change_in_assign = np.abs(oldassignment - index).sum()
         if logger:
             logger.add_scalar('ARI', ari, epoch)

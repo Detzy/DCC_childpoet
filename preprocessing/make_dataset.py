@@ -1,10 +1,15 @@
 import os
-from pytorch.config import get_data_dir
+import sys
 import glob
 import os.path as osp
 import numpy as np
 import scipy.io as sio
 from imageio import imread
+
+config_path = os.path.abspath('pytorch')
+print(config_path)
+sys.path.append(config_path)
+from config import get_data_dir
 
 """
 File responsible for preprocessing image files to csv files: testdata.csv and traindata.csv
@@ -46,12 +51,41 @@ def iterate_image_files(folder_path):
 
 
 def shuffle_vectors(vec2d, vec1d):
+    """
+    Shuffles two vectors equally across the first axis.
+
+    Parameters
+    ----------
+    :param vec2d: 2D Array to shuffle
+    :param vec1d: 1D Array to shuffle
+
+    :returns: 2D array, 1D array
+    -------
+
+    """
     assert vec2d.shape[0] == vec1d.shape[0]
     p = np.random.permutation(vec2d.shape[0])
     return vec2d[p, :], vec1d[p]
 
 
 def main(image_path, data_name, tt_split_ratio=0.8):
+    """
+    Based on the given path and dataset name, it splits the dataset into training data and test data.
+    Both are randomly shuffled. Saves both to .mat files.
+
+    Parameters
+    ----------
+    image_path
+    data_name
+    tt_split_ratio
+
+    Returns
+    -------
+
+    """
+    seed = 42
+    np.random.seed(seed)
+
     datadir = get_data_dir(data_name)
 
     x, y, filenames = iterate_image_files(folder_path=image_path)

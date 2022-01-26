@@ -5,6 +5,7 @@ import math
 import numpy as np
 import scipy.io as sio
 import argparse
+import collections
 import matplotlib.pyplot as plt
 
 from config import cfg, get_data_dir, get_output_dir, AverageMeter, remove_files_in_dir
@@ -36,60 +37,73 @@ except ImportError:
 parser = argparse.ArgumentParser(description='PyTorch DCC Finetuning')
 # parser.add_argument('--data', dest='db', type=str, default='child_poet',
 #                     help='Name of the dataset. The name should match with the output folder name.')
-parser.add_argument('--data', dest='db', type=str, default='mnist',
+parser.add_argument('--data', dest='db', type=str, default='child_poet',
                     help='Name of the dataset. The name should match with the output folder name.')
 
 
 def main(arg):
-    threshold = 100
+
     # outputdir = get_output_dir(arg.db)
     datadir = get_data_dir(arg.db)
-    data1 = sio.loadmat(os.path.join(datadir, 'pretrained.mat'))
 
-    fo = open(os.path.join(datadir, 'pretrained.pkl'), 'rb')
-    data2 = pickle.load(fo)
-    fo.close()
+    clustering = sio.loadmat(os.path.join(datadir, 'results/features'))
+    traindata = sio.loadmat(os.path.join(datadir, 'traindata.mat'))
+    testdata = sio.loadmat(os.path.join(datadir, 'testdata.mat'))
 
-    train_data = zip(data1['X'][:].astype(np.float32),
-                     data2['data'][:].astype(np.float32))
+    clustering = clustering['cluster'][0].astype(np.int)
+    fulldata = np.concatenate((traindata['X'][:].astype(np.float32), testdata['X'][:].astype(np.float32)), axis=0)
 
-    # train_labels = np.squeeze(data['Y'][:])
-    for row1, row2 in train_data:
-        # img1 = row1.reshape((32, 32))
-        # img2 = row2.reshape((32, 32))
-        img1 = row1.reshape((28, 28))
-        img2 = row2.reshape((28, 28))
-        print("Imshowing")
-        fig = plt.figure()
-        fig.add_subplot(2, 1, 1)
-        plt.imshow(img1)
-        fig.add_subplot(2, 1, 2)
-        plt.imshow(img2)
-        # plt.imshow(img2)
+    print(len(clustering), len(fulldata), len(traindata), len(testdata), len(traindata) + len(testdata))
+    print(
+        clustering.shape,
+        fulldata.shape,
+        traindata['X'][:].astype(np.float32).shape,
+        testdata['X'][:].astype(np.float32).shape
+    )
+
+    # fo = open(os.path.join(datadir, 'pretrained.pkl'), 'rb')
+    # data2 = pickle.load(fo)
+    # fo.close()
+
+    # train_data = zip(
+    #     clustering,
+    #     fulldata,
+    # )
+
+    count = collections.Counter(clustering)
+
+    threshold = 30
+    above_threshold = [k for k in count if count[k] < threshold]
+
+    print(max(clustering), min(clustering))
+    print(clustering)
+    print([(k, count[k]) for k in count if count[k] > 30])
+
+    for cluster_to_show in above_threshold[1:]:
+        print("Imshowing", cluster_to_show)
+        count = 0
+        fig = plt.figure(figsize=(100, 100))
+        for cluster, img_row in zip(clustering, fulldata):
+            if cluster != cluster_to_show:
+                continue
+
+            img = img_row.reshape((32, 32))
+
+            # img1 = row1.reshape((28, 28))
+            # img2 = row2.reshape((28, 28))
+            # print("Imshowing", cluster)
+
+            fig.add_subplot(3, 5, count+1)
+            plt.imshow(img)
+            count += 1
+            if count == 15:
+                count = 0
+                plt.show()
+                fig = plt.figure(figsize=(100, 100))
+
+        # make sure to show final bit too
         plt.show()
-    # output = sio.loadmat(os.path.join(outputdir, 'features'))
-    # labels = output.get('gtlabels')[0]
-    # clusters = output.get('cluster')[0]
-    #
-    # print(min(labels), max(labels))
-    # print(min(clusters), max(clusters))
-    #
-    # cumsum = 0
-    # for i in range(10):
-    #     cumsum += sum(labels == i)
-    #     print(sum(labels == i), "of", i, "| cumulative:", cumsum)
-    #
-    # print("----------------")
-    # cumsum = 0
-    # for i in range(max(clusters)+1):
-    #     entries = sum(clusters == i)
-    #     if entries > threshold:
-    #         cumsum += entries
-    #         print(entries, "of", i, "| cumulative:", cumsum)
-    #
-    # print(data['X'][0][:])
-    # print(data['X'][0][:])
-
+        plt.close()
 
 
 if __name__ == '__main__':
