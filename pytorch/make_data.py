@@ -203,5 +203,5 @@ if __name__ == '__main__':
             make_misc_data(datadir, 'yale_DoG.pkl', [168, 192, 1], isconv=True)
         elif args.db == 'easy':
             make_easy_visual_data(datadir)
-        elif args.db == 'child_poet':
-            make_misc_data(datadir, 'child_poet.pkl', [32, 32, 1], isconv=True)
+        # elif args.db == 'child_poet':
+        #     make_misc_data(datadir, 'child_poet.pkl', [32, 32, 1], isconv=True)
