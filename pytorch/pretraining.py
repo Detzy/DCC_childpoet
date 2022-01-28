@@ -219,3 +219,4 @@ def save_checkpoint(state, index, filename):
 if __name__ == '__main__':
     args = parser.parse_args()
     main(args)
+    # TODO: FIX lr_scheduler.step vs optimizer.step

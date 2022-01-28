@@ -41,9 +41,7 @@ parser.add_argument('--data', dest='db', type=str, default='child_poet',
                     help='Name of the dataset. The name should match with the output folder name.')
 
 
-def main(arg):
-
-    # outputdir = get_output_dir(arg.db)
+def inspect_clustering(arg):
     datadir = get_data_dir(arg.db)
 
     clustering = sio.loadmat(os.path.join(datadir, 'results/features'))
@@ -93,7 +91,7 @@ def main(arg):
             # img2 = row2.reshape((28, 28))
             # print("Imshowing", cluster)
 
-            fig.add_subplot(3, 5, count+1)
+            fig.add_subplot(3, 5, count + 1)
             plt.imshow(img)
             count += 1
             if count == 15:
@@ -104,6 +102,52 @@ def main(arg):
         # make sure to show final bit too
         plt.show()
         plt.close()
+
+
+def inspect_files(arg):
+    datadir = get_data_dir(arg.db)
+
+    # fo = open(os.path.join(datadir, 'pretrained.pkl'), 'rb')
+    # pretrained_pkl = pickle.load(fo)
+    # fo.close()
+
+    pretrained_mat = sio.loadmat(os.path.join(datadir, 'pretrained.mat'))
+    train_data = sio.loadmat(os.path.join(datadir, 'traindata.mat'))
+    test_data = sio.loadmat(os.path.join(datadir, 'testdata.mat'))
+
+    # print(pretrained_pkl['Z'])
+    print(pretrained_mat['X'])
+    print(pretrained_mat['w'].shape)
+    print(pretrained_mat['gtlabels'])
+    for row in pretrained_mat['w']:
+        print(row)
+    # print(pretrained_mat.keys())
+    # print(train_data.keys())
+    # print(train_data['X'].shape)
+    # print(train_data['Y'].shape)
+    # print(test_data['X'].shape)
+    # print(test_data['Y'].shape)
+
+    # print(np.asarray(train_data['X']))
+    # for (x, y), elm in np.ndenumerate(np.asarray(train_data['X'])):
+    #     if elm != 1 and elm != 0:
+    #         print(elm)
+    #
+    # print(np.asarray(test_data['X']))
+    # for (x, y), elm in np.ndenumerate(np.asarray(test_data['X'])):
+    #     if elm != 1 and elm != 0:
+    #         print(elm)
+    #
+    # print(np.asarray(train_data['Y']))
+    # for (x, y), elm in np.ndenumerate(np.asarray(train_data['Y'])):
+    #     if elm not in range(0, 3):
+    #         print(elm)
+
+
+
+def main(arg):
+    # inspect_clustering(arg)
+    inspect_files(arg)
 
 
 if __name__ == '__main__':

@@ -1,15 +1,10 @@
 import os
-import sys
+from config import get_data_dir
 import glob
 import os.path as osp
 import numpy as np
 import scipy.io as sio
 from imageio import imread
-
-config_path = os.path.abspath('pytorch')
-print(config_path)
-sys.path.append(config_path)
-from config import get_data_dir
 
 """
 File responsible for preprocessing image files to csv files: testdata.csv and traindata.csv
@@ -111,6 +106,8 @@ def main(image_path, data_name, tt_split_ratio=0.8):
             'filenames': filenames_shuffled[tt_split:]
         },
     )
+
+    print("Training and test data saved to file")
 
 
 if __name__ == '__main__':
