@@ -44,17 +44,31 @@ parser.add_argument('--data', dest='db', type=str, default='child_poet',
 def generate_cluster_plot(arg):
     datadir = get_data_dir(arg.db)
 
-    clustering = sio.loadmat(os.path.join(datadir, 'results/features'))
-    clustering = clustering['cluster'][0].astype(np.int)
+    data_parameters = [
+        ("10", "0_1"),
+        ("15", "0_1"),
+        ("20", "0_1"),
+        ("25", "0_1"),
+        ("30", "0_1"),
+        ("50", "0_1"),
+    ]
+    for k, lr in data_parameters:
+        clustering = sio.loadmat(os.path.join(datadir, 'results/features_k{}_lr{}'.format(k, lr)))
+        clustering = clustering['cluster'][0].astype(np.int)
 
-    cluster_sizes = collections.Counter(clustering)
+        cluster_sizes = collections.Counter(clustering)
 
-    highest_bin = 500
-    lowest_bin = 0
+        highest_bin = 500
+        lowest_bin = 0
 
-    bins = range(lowest_bin, highest_bin+5, 5) 
+        bins = range(lowest_bin, highest_bin+5, 5) 
 
-    cluster_size_hist = plt.hist(cluster_sizes.values(), bins=bins)
+        cluster_size_hist = plt.hist(cluster_sizes.values(), bins=bins)
+        cluster_size_hist.save()
+        
+        class_0_confusion_matrix = []
+
+
     
 
 
