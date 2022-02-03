@@ -70,6 +70,7 @@ def generate_cluster_plots(arg):
             log=True
         )
         plt.savefig(os.path.join(datadir, 'analysis/cluster_histogram_k{}_lr{}'.format(k, lr)))
+        plt.clf()
 
         # ------------------------------
         # Create confusion matrix for class 0 (flat terrain)
@@ -101,6 +102,10 @@ def generate_cluster_plots(arg):
 
     df = pd.DataFrame(class_0_confusion_matrix)
     df.to_csv(os.path.join(datadir, 'analysis/class_0_confusion_matrix'))
+
+
+def plot_cluster_snapshots():
+    raise NotImplementedError
 
 
 def main(arg):
