@@ -154,6 +154,7 @@ def pretrain(args, outputdir, params, use_cuda, trainloader, testloader, summary
         print('\nIndex: %d \t Maxepoch: %d'%(index, maxepoch[index]))
 
         for epoch in range(maxepoch[index]):
+            optimizer.step()  # This might be wrong, but not doing it gave an error
             scheduler.step()
             train(trainloader, net, index, optimizer, epoch, use_cuda, summary_writer)
             test(testloader, net, index, epoch, use_cuda, summary_writer)
@@ -178,8 +179,9 @@ def train(trainloader, net, index, optimizer, epoch, use_cuda, summary_writer):
         if use_cuda:
             inputs = inputs.cuda()
         optimizer.zero_grad()
-        inputs_Var = Variable(inputs)
-        outputs = net(inputs_Var, index)
+        # inputs_Var = Variable(inputs)
+        # outputs = net(inputs_Var, index)
+        outputs = net(inputs, index)
 
         # record loss
         losses.update(outputs.item(), inputs.size(0))
@@ -201,8 +203,9 @@ def test(testloader, net, index, epoch, use_cuda, summary_writer):
     for batch_idx, (inputs, targets) in enumerate(testloader):
         if use_cuda:
             inputs = inputs.cuda()
-        inputs_Var = Variable(inputs, volatile=True)
-        outputs = net(inputs_Var, index)
+        # inputs_Var = Variable(inputs, volatile=True)
+        # outputs = net(inputs_Var, index)
+        outputs = net(inputs, index)
 
         # measure accuracy and record loss
         losses.update(outputs.item(), inputs.size(0))
