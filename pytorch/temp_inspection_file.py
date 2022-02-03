@@ -41,6 +41,23 @@ parser.add_argument('--data', dest='db', type=str, default='child_poet',
                     help='Name of the dataset. The name should match with the output folder name.')
 
 
+def generate_cluster_plot(arg):
+    datadir = get_data_dir(arg.db)
+
+    clustering = sio.loadmat(os.path.join(datadir, 'results/features'))
+    clustering = clustering['cluster'][0].astype(np.int)
+
+    cluster_sizes = collections.Counter(clustering)
+
+    highest_bin = 500
+    lowest_bin = 0
+
+    bins = range(lowest_bin, highest_bin+5, 5) 
+
+    cluster_size_hist = plt.hist(cluster_sizes.values(), bins=bins)
+    
+
+
 def inspect_clustering(arg):
     datadir = get_data_dir(arg.db)
 
