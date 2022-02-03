@@ -69,13 +69,83 @@ def generate_cluster_plot(arg):
         class_0_confusion_matrix = []
 
 
-    
+def inspect_class_0(arg):
+    # k, date = '10', 'jan31'
+    # k, date = '15', 'jan31'
+    # k, date = '20', 'jan31'
+    # k, date = '25', 'feb2'
+    k, date = '30', 'feb2'
+    lr = '0_1'
+
+    datadir = get_data_dir(arg.db)
+
+    clustering = sio.loadmat(os.path.join(datadir, 'results/features_{}_k{}_lr{}'.format(date, k, lr)))
+    traindata = sio.loadmat(os.path.join(datadir, 'traindata.mat'))
+    testdata = sio.loadmat(os.path.join(datadir, 'testdata.mat'))
+
+    clustering = clustering['cluster'][0].astype(np.int)
+    fulldata = np.concatenate((traindata['X'][:].astype(np.float32), testdata['X'][:].astype(np.float32)), axis=0)
+
+    cluster_to_show = 0
+    flat_terrain = np.zeros((32*32))
+    flat_terrain[32*16:] = np.ones((32*16))
+
+    print("Showing false positives for class 0")
+    count = 0
+    fig = plt.figure(figsize=(100, 100))
+    for label, img_row in zip(clustering, fulldata):
+        if label == cluster_to_show:
+            if not np.array_equal(img_row, flat_terrain):
+
+                img = img_row.reshape((32, 32))
+
+                fig.add_subplot(4, 6, (count % 24) + 1)
+                plt.imshow(img)
+
+                count += 1
+                if count == 24:
+                    count = 0
+                    plt.show()
+                    fig = plt.figure(figsize=(100, 100))
+
+    # make sure to show final bit too
+    plt.show()
+    plt.close()
+
+    print("Showing false negatives for class 0")
+    count = 0
+    fig = plt.figure(figsize=(100, 100))
+    for label, img_row in zip(clustering, fulldata):
+        if label != cluster_to_show:
+            if np.array_equal(img_row, flat_terrain):
+
+                img = img_row.reshape((32, 32))
+
+                fig.add_subplot(4, 6, (count % 24) + 1)
+                plt.imshow(img)
+
+                count += 1
+                if count == 24:
+                    count = 0
+                    plt.show()
+                    fig = plt.figure(figsize=(100, 100))
+
+    # make sure to show final bit too
+    plt.show()
+    plt.close()
 
 
 def inspect_clustering(arg):
+    # k, date = '10', 'jan31'
+    # k, date = '15', 'jan31'
+    # k, date = '20', 'jan31'
+    # k, date = '25', 'feb2'
+    k, date = '30', 'feb2'
+    lr = '0_1'
+
     datadir = get_data_dir(arg.db)
 
-    clustering = sio.loadmat(os.path.join(datadir, 'results/features'))
+    clustering = sio.loadmat(os.path.join(datadir, 'results/features_{}_k{}_lr{}'.format(date, k, lr)))
     traindata = sio.loadmat(os.path.join(datadir, 'traindata.mat'))
     testdata = sio.loadmat(os.path.join(datadir, 'testdata.mat'))
 
@@ -90,26 +160,28 @@ def inspect_clustering(arg):
         testdata['X'][:].astype(np.float32).shape
     )
 
-    # fo = open(os.path.join(datadir, 'pretrained.pkl'), 'rb')
-    # data2 = pickle.load(fo)
-    # fo.close()
-
-    # train_data = zip(
-    #     clustering,
-    #     fulldata,
-    # )
-
     count = collections.Counter(clustering)
 
-    threshold = 30
-    above_threshold = [k for k in count if count[k] < threshold]
+    threshold = 5
+    threshold_type = "none"
+    class_offset = 1
 
-    print(max(clustering), min(clustering))
-    print(clustering)
-    print([(k, count[k]) for k in count if count[k] > 30])
+    if threshold_type == "none":
+        to_show = [(k, count[k]) for k in count]
+        print("Number of clusters:", max(clustering+1), len(count))
+        print("Size of cluster 0:", to_show[0][1])
+        print("Second largest cluster:", max([b for a, b in to_show[1:]]))
+        print("Number of clusters total", len(to_show))
+    elif threshold_type == "below":
+        to_show = [(k, count[k]) for k in count if count[k] <= threshold]
+        print("Number of clusters below or equal to threshold {}:".format(threshold), len(to_show))
+    elif threshold_type == "above":
+        to_show = [(k, count[k]) for k in count if count[k] > threshold]
+        print("Number of clusters above threshold {}:".format(threshold), len(to_show))
 
-    for cluster_to_show in above_threshold[1:]:
-        print("Imshowing", cluster_to_show)
+    return # if plotting is not desired
+    for (cluster_to_show, cluster_size) in to_show[class_offset:]:
+        print("Imshowing", cluster_to_show, " | Size:", cluster_size)
         count = 0
         fig = plt.figure(figsize=(100, 100))
         for cluster, img_row in zip(clustering, fulldata):
@@ -117,10 +189,6 @@ def inspect_clustering(arg):
                 continue
 
             img = img_row.reshape((32, 32))
-
-            # img1 = row1.reshape((28, 28))
-            # img2 = row2.reshape((28, 28))
-            # print("Imshowing", cluster)
 
             fig.add_subplot(3, 5, count + 1)
             plt.imshow(img)
@@ -177,8 +245,9 @@ def inspect_files(arg):
 
 
 def main(arg):
-    # inspect_clustering(arg)
-    inspect_files(arg)
+    inspect_clustering(arg)
+    # inspect_class_0(arg)
+    # inspect_files(arg)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 
+
 # The model definition for Stacked Denoising AE.
 # This model is used during the pretraining stage.
 class SDAE(nn.Module):
@@ -26,9 +27,9 @@ class SDAE(nn.Module):
         # initialization
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                init.normal(m.weight, std=1e-2)
+                init.normal_(m.weight, std=1e-2)
                 if m.bias.data is not None:
-                    init.constant(m.bias, 0)
+                    init.constant_(m.bias, 0)
 
     def forward(self,x,index):
         inp = x.view(-1, self.in_dim)
