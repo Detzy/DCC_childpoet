@@ -1,4 +1,4 @@
-conda activate DCC_childpoet &&
+:: conda activate DCC_childpoet &&
 :: Before running, ensure you have made testdata.mat and traindata.mat input
 :: First, we make the input graph stored in pretrained.mat:
 python pytorch/edgeConstruction.py --dataset child_poet --prep none --samples 50012 &&
