@@ -211,6 +211,7 @@ def main(args, net=None):
     output = {'Z': Z, 'U': U, 'gtlabels': labels, 'w': pairs, 'cluster': assignment}
     sio.savemat(os.path.join(outputdir, 'features'), output)
 
+
 def load_weights(args, outputdir, net):
     filename = os.path.join(outputdir, args.torchmodel)
     if os.path.isfile(filename):
@@ -220,6 +221,7 @@ def load_weights(args, outputdir, net):
     else:
         print("==> no checkpoint found at '{}'".format(filename))
         raise ValueError
+
 
 # Training
 def train(trainloader, net, optimizer, criterion1, criterion2, epoch, use_cuda, _sigma1, _sigma2, _lambda, logger):
@@ -315,6 +317,7 @@ def test(testloader, net, criterion, epoch, use_cuda, _delta, pairs, numeval, fl
 
     return features, U, change_in_assign, assignment
 
+
 def plot_to_image(U, title):
     plt.clf()
     plt.scatter(U[:,0], U[:,1])
@@ -327,10 +330,12 @@ def plot_to_image(U, title):
     image = ToTensor()(image)
     return image
 
+
 # Saving checkpoint
 def save_checkpoint(state, index, filename):
     newfilename = os.path.join(filename, 'FTcheckpoint_%d.pth.tar' % index)
     torch.save(state, newfilename)
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
