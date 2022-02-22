@@ -10,7 +10,7 @@ import pandas as pd
 class DCCPT_data(data.Dataset):
     """Custom dataset loader for Pretraining SDAE"""
 
-    def __init__(self, root, train=True, dtype="mat", labeled=False):
+    def __init__(self, root, train=True, dtype="mat", labeled=False, single_data_point=False):
         self.root_dir = root
         self.train = train
 
@@ -41,7 +41,10 @@ class DCCPT_data(data.Dataset):
             else:
                 raise ValueError("Bad file type:", dtype, " (Use either h5, csv or mat)")
             self.test_data = data['X'][:].astype(np.float32)
-            self.test_labels = np.squeeze(data['Y'][:])
+            if single_data_point:
+                self.test_labels = data['Y'][:]
+            else:
+                self.test_labels = np.squeeze(data['Y'][:])
 
     def __len__(self):
         if self.train:
