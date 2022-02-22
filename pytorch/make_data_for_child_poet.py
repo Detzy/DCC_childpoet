@@ -29,6 +29,7 @@ def iterate_image_files(folder_path):
     for full_filepath in file_iterator:
         # break_point += 1
         # if break_point >= 100:
+        #     # Break point for testing on smaller data sets
         #     break
         img = imread(full_filepath, as_gray=True)
 
@@ -112,7 +113,7 @@ def main(image_path, data_name, tt_split_ratio=0.8):
 
 if __name__ == '__main__':
     train_test_split_ratio = 0.8
-    dn = "child_poet"
+    dn = "child_poet_single_file"
     base_path = r'/uio/hume/student-u31/eirikolb/img/poet_dec2_168h'
     image_folder_path = base_path + '/img_files'
     main(image_path=image_folder_path, data_name=dn, tt_split_ratio=train_test_split_ratio)
