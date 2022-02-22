@@ -92,8 +92,8 @@ def inspect_clustering(arg):
     # k = '15'
     # k = '20'
     # k = '25'
-    # k = '30'
-    k = '50'
+    k = '30'
+    # k = '50'
     lr = '0_1'
 
     datadir = get_data_dir(arg.db)
@@ -115,8 +115,8 @@ def inspect_clustering(arg):
 
     count = collections.Counter(clustering)
 
-    threshold = 1
-    threshold_type = "below"
+    threshold = 30
+    threshold_type = "above"
     class_offset = 1
 
     if threshold_type == "none":
@@ -127,9 +127,12 @@ def inspect_clustering(arg):
         print("Number of clusters total", len(to_show))
     elif threshold_type == "below":
         to_show = [(k, count[k]) for k in count if count[k] <= threshold]
+        print(to_show)
         print("Number of clusters below or equal to threshold {}:".format(threshold), len(to_show))
     elif threshold_type == "above":
         to_show = [(k, count[k]) for k in count if count[k] > threshold]
+        print(to_show)
+        print(threshold)
         print("Number of clusters above threshold {}:".format(threshold), len(to_show))
 
     # return # if plotting is not desired
