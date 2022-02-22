@@ -71,13 +71,16 @@ def main(image_path, data_name, tt_split_ratio=0.8):
 
     Parameters
     ----------
-    image_path
-    data_name
-    tt_split_ratio
+    image_path      :   String
+                        Path to the folder containing the images of the dataset
+    data_name       :   String
+                        Name of the dataset
+    tt_split_ratio  :   float
+                        Float value between 0 and 1 determining split between test and training data.
 
     Returns
     -------
-
+    None
     """
     seed = 42
     np.random.seed(seed)

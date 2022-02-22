@@ -21,6 +21,21 @@ parser.add_argument('--data', dest='db', type=str, default='child_poet',
 
 
 def generate_cluster_plots(arg):
+    """
+    This function is made to output useful plots and statistics of the DCC clustering of childpoet dataset.
+    First output is a set of histogram plots of the cluster size distribution (with the outlier class 0 not included).
+    Second output is a confusion matrix for the outlier class 0. The confusion matrix is technically meaningless
+    for clustering algorithms, but makes sense if we assume that class 0 should be perfectly flat terrain.
+
+    Parameters
+    ----------
+    arg :   argparser
+            Argparser that is a relic from the rest of DCC. Only has the db parameter.
+
+    Returns
+    -------
+    None
+    """
     datadir = get_data_dir(arg.db)
 
     data_parameters = [
@@ -102,10 +117,6 @@ def generate_cluster_plots(arg):
 
     df = pd.DataFrame(class_0_confusion_matrix)
     df.to_csv(os.path.join(datadir, 'analysis/class_0_confusion_matrix'))
-
-
-def plot_cluster_snapshots():
-    raise NotImplementedError
 
 
 def main(arg):

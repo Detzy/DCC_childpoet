@@ -4,7 +4,6 @@ import numpy as np
 import scipy.io as sio
 import argparse
 import collections
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from config import get_data_dir
@@ -19,8 +18,28 @@ parser = argparse.ArgumentParser(description='PyTorch DCC Finetuning')
 parser.add_argument('--data', dest='db', type=str, default='child_poet',
                     help='Name of the dataset. The name should match with the output folder name.')
 
+"""
+Utility file for inspecting some of the output and input of DCC for childpoet.
+Used during development for whatever I needed in the moment, so it might seem somewhat nonsensical. 
+Still, I leave it here in case others find it useful.  
+"""
+
 
 def inspect_class_0(arg):
+    """
+    Class 0 is the flat terrain for childpoet dataset.
+    Therefore, we can somewhat reasonably inspect the performance of this class,
+    and calculate false positives and false negatives for the class,
+    which we then display as images to visually understand performance.
+    Parameters
+    ----------
+    arg :   argparser
+            Argparser that is a relic from the rest of DCC. Only has the db parameter.
+
+    Returns
+    -------
+    None
+    """
     # k = '10'
     # k = '15'
     # k = '20'
@@ -88,6 +107,20 @@ def inspect_class_0(arg):
 
 
 def inspect_clustering(arg):
+    """
+    Inspect clustering from DCC, by prints of dataset information,
+    and plots of images belonging to the classes.
+    In the function are parameters for thresholds of cluster sizes and similar.
+
+    Parameters
+    ----------
+    arg :   argparser
+            Argparser that is a relic from the rest of DCC. Only has the db parameter.
+
+    Returns
+    -------
+    None
+    """
     # k = '10'
     # k = '15'
     # k = '20'
