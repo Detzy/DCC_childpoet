@@ -16,7 +16,7 @@ except ImportError:
 
 
 parser = argparse.ArgumentParser(description='PyTorch DCC Finetuning')
-parser.add_argument('--data', dest='db', type=str, default='child_poet',
+parser.add_argument('--data', dest='db', type=str, default='child_poet_rebalanced',
                     help='Name of the dataset. The name should match with the output folder name.')
 
 
@@ -38,6 +38,9 @@ def generate_cluster_plots(arg):
     """
     datadir = get_data_dir(arg.db)
 
+    ymin = 0
+    ymax = 3000
+
     data_parameters = [
         ("10", "0_1"),
         ("15", "0_1"),
@@ -49,6 +52,8 @@ def generate_cluster_plots(arg):
 
     class_0_confusion_matrix = {
         'k': [],
+        'n': [],
+        'c_n': [],
         'lr': [],
         'tp': [],
         'fp': [],
@@ -71,7 +76,9 @@ def generate_cluster_plots(arg):
 
         cluster_sizes = collections.Counter(clustering)
 
-        highest_bin = max(list(cluster_sizes.values())[1:])+1  # Selected as the SECOND largest cluster
+        highest_bins = list(cluster_sizes.values())
+        highest_bins.sort(reverse=True)
+        second_highest_bin = highest_bins[1] + 1  # Selected as the SECOND largest cluster
         steps = 20
 
         plt.title(label="Cluster distribution for parameters k={}".format(k))
@@ -81,14 +88,24 @@ def generate_cluster_plots(arg):
         plt.hist(
             cluster_sizes.values(),
             bins=steps,
-            range=(0, highest_bin),
+            range=(0, second_highest_bin),
             log=True
         )
-        plt.savefig(os.path.join(datadir, 'analysis/cluster_histogram_k{}_lr{}'.format(k, lr)))
+
+        ax = plt.gca()
+        ax.set_ylim([ymin, ymax])
+
+        plt.savefig(os.path.join(datadir, f'analysis/cluster_histogram_k{k}_lr{lr}'))
         plt.clf()
 
         # ------------------------------
         # Create confusion matrix for class 0 (flat terrain)
+        # Note that in some cases, flat terrain is not actually labeled as class 0,
+        # so we need to find the actual class 0 label
+        l1, l2 = zip(*sorted(zip(list(cluster_sizes.values()), list(cluster_sizes.keys())), reverse=True))
+        flat_terrain_label = l2[0]
+        print(flat_terrain_label)
+
         flat_terrain = np.zeros((32 * 32))
         flat_terrain[32 * 16:] = np.ones((32 * 16))
 
@@ -97,7 +114,7 @@ def generate_cluster_plots(arg):
         false_positive = 0
         false_negative = 0
         for label, img_row in zip(clustering, fulldata):
-            if label == 0:
+            if label == flat_terrain_label:
                 if np.array_equal(img_row, flat_terrain):
                     true_positive += 1
                 else:
@@ -109,14 +126,16 @@ def generate_cluster_plots(arg):
                     true_negative += 1
 
         class_0_confusion_matrix['k'].append(k)
+        class_0_confusion_matrix['n'].append(len(clustering))
+        class_0_confusion_matrix['c_n'].append(max(clustering))
         class_0_confusion_matrix['lr'].append(lr)
         class_0_confusion_matrix['tp'].append(true_positive)
         class_0_confusion_matrix['fp'].append(false_positive)
         class_0_confusion_matrix['tn'].append(true_negative)
         class_0_confusion_matrix['fn'].append(false_negative)
 
-    df = pd.DataFrame(class_0_confusion_matrix)
-    df.to_csv(os.path.join(datadir, 'analysis/class_0_confusion_matrix'))
+        df = pd.DataFrame(class_0_confusion_matrix)
+        df.to_csv(os.path.join(datadir, f'analysis/class_0_confusion_matrix_k{k}_lr{lr}'))
 
 
 def main(arg):

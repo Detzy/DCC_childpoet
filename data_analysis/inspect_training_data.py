@@ -15,7 +15,7 @@ except ImportError:
 
 
 parser = argparse.ArgumentParser(description='PyTorch DCC Finetuning')
-parser.add_argument('--data', dest='db', type=str, default='child_poet',
+parser.add_argument('--data', dest='db', type=str, default='child_poet_rebalanced',
                     help='Name of the dataset. The name should match with the output folder name.')
 
 """
@@ -44,8 +44,8 @@ def inspect_class_0(arg):
     # k = '15'
     # k = '20'
     # k = '25'
-    # k = '30'
-    k = '50'
+    k = '30'
+    # k = '50'
     lr = '0_1'
 
     datadir = get_data_dir(arg.db)
@@ -57,7 +57,7 @@ def inspect_class_0(arg):
     testdata = sio.loadmat(os.path.join(datadir, 'testdata.mat'))
     fulldata = np.concatenate((traindata['X'][:].astype(np.float32), testdata['X'][:].astype(np.float32)), axis=0)
 
-    cluster_to_show = 0
+    cluster_to_show = 5
     flat_terrain = np.zeros((32*32))
     flat_terrain[32*16:] = np.ones((32*16))
 
@@ -67,10 +67,11 @@ def inspect_class_0(arg):
     for label, img_row in zip(clustering, fulldata):
         if label == cluster_to_show:
             if not np.array_equal(img_row, flat_terrain):
-
+                xcount = 3
+                ycount = 3
                 img = img_row.reshape((32, 32))
 
-                fig.add_subplot(4, 6, (count % 24) + 1)
+                fig.add_subplot(ycount, xcount, (count % (xcount*ycount)) + 1)
                 plt.imshow(img)
 
                 count += 1
@@ -193,8 +194,8 @@ def inspect_clustering(arg):
 
 
 def main(arg):
-    inspect_clustering(arg)
-    # inspect_class_0(arg)
+    # inspect_clustering(arg)
+    inspect_class_0(arg)
 
 
 if __name__ == '__main__':
