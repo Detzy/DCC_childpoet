@@ -126,6 +126,8 @@ def load_predefined_net(args, params):
         net = sdae_easy(dropout=params['dropout'], slope=params['reluslope'], dim=args.dim)
     elif args.db == 'child_poet':
         net = sdae_childpoet(dropout=params['dropout'], slope=params['reluslope'], dim=args.dim)
+    elif args.db == 'child_poet_rebalanced':
+        net = sdae_childpoet(dropout=params['dropout'], slope=params['reluslope'], dim=args.dim)
     else:
         raise ValueError("Unexpected database %s" % args.db)
 
@@ -156,6 +158,8 @@ def load_predefined_extract_net(args):
     elif args.db == easy.name:
         net = extract_sdae_easy(slope=reluslope, dim=args.dim)
     elif args.db == 'child_poet':
+        net = extract_sdae_childpoet(slope=reluslope, dim=args.dim)
+    elif args.db == 'child_poet_rebalanced':
         net = extract_sdae_childpoet(slope=reluslope, dim=args.dim)
     else:
         raise ValueError("Unexpected database %s" % args.db)

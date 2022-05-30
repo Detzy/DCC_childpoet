@@ -11,13 +11,61 @@ File responsible for preprocessing image files to csv files: testdata.csv and tr
 """
 
 
+def is_flat_terrain(x):
+    """
+    Checks if the image is flat terrain.
+    """
+    half = 512
+    if np.sum(x[half:]) == half and np.sum(x[:half]) == 0:
+        return True
+    else:
+        return False
+
+
+def balance_flat_terrain_amount(x, filenames, maximum_amount=2232):
+    """
+    Balances the amount of flat terrain in the dataset.
+    Parameters
+    ----------
+    x               :   ndarray,
+                        2D array of n images
+    filenames       :   ndarray,
+                        1D array of shape (n,)
+    maximum_amount  :   int
+
+    Returns
+    -------
+    x, filenames
+    """
+    flat_terrain_amount = 0
+    to_include = []
+    for i in range(x.shape[0]):
+        if is_flat_terrain(x[i, :]) and flat_terrain_amount < maximum_amount:
+            flat_terrain_amount += 1
+            to_include.append(i)
+        elif is_flat_terrain(x[i, :]) and flat_terrain_amount == maximum_amount:
+            continue
+        else:
+            to_include.append(i)
+    x = x[to_include, :]
+    filenames = filenames[to_include]
+    print(len(to_include), len(x), len(filenames))
+    return x, filenames
+
+
 def iterate_image_files(folder_path):
     """
     Iterates through a folder, listing any image file and produces an 'X' array with images unpacked to a 1D vector,
-    and a 'file_names' array with the names of t. The 'Y' array is full of random numbers.
+    and a 'file_names' array with the names of t.
 
-    :param folder_path: Complete system path of folder containing the images
-    :return: np.array of shape (n, 4) where n is the number of images with the given label
+    Parameters
+    ----------
+    folder_path     :   str
+                        Complete system path of folder containing the
+
+    Returns
+    -------
+    X - array contains the unpacked images, file_names - contains the file names
     """
     to_iterate = folder_path + "/*.png"
     file_iterator = glob.iglob(to_iterate)
@@ -41,9 +89,8 @@ def iterate_image_files(folder_path):
 
     file_names = np.array(file_names)
     x = np.array(image_vector)
-    y = np.random.randint(0, 3, file_names.size)
 
-    return x, y, file_names
+    return x, file_names
 
 
 def shuffle_vectors(vec2d, vec1d):
@@ -67,7 +114,8 @@ def shuffle_vectors(vec2d, vec1d):
 def main(image_path, data_name, tt_split_ratio=0.8):
     """
     Based on the given path and dataset name, it splits the dataset into training data and test data.
-    Both are randomly shuffled. Saves both to .mat files.
+    Removes a significant amount of flat terrain from the data to balance the data set. It also shuffles the data.
+    Saves data to .mat files.
 
     Parameters
     ----------
@@ -82,12 +130,15 @@ def main(image_path, data_name, tt_split_ratio=0.8):
     -------
     None
     """
+    rebalanced_class_0 = 2232  # This number is empirical from later experiments
     seed = 42
     np.random.seed(seed)
 
     datadir = get_data_dir(data_name)
 
-    x, y, filenames = iterate_image_files(folder_path=image_path)
+    x, filenames = iterate_image_files(folder_path=image_path)
+    x, filenames = balance_flat_terrain_amount(x, filenames, rebalanced_class_0)
+    y = np.random.randint(0, 3, filenames.size)  # Just random labels
     x_shuffled, filenames_shuffled = shuffle_vectors(x, filenames)
     assert x_shuffled.shape == x.shape
     assert filenames_shuffled.shape == filenames.shape
@@ -116,7 +167,7 @@ def main(image_path, data_name, tt_split_ratio=0.8):
 
 if __name__ == '__main__':
     train_test_split_ratio = 0.8
-    dn = "child_poet_single_file"
+    dn = "child_poet_rebalanced"
     base_path = r'/uio/hume/student-u31/eirikolb/img/poet_dec2_168h'
     image_folder_path = base_path + '/img_files'
     main(image_path=image_folder_path, data_name=dn, tt_split_ratio=train_test_split_ratio)
